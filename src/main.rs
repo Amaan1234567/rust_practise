@@ -1,93 +1,62 @@
-struct User {
-    active: bool,
-    username: String,
-    email: String,
-    sign_in_count: u64,
+enum IpAddrKind {
+    V4,
+    V6,
 }
 
-struct color(i32, i32, i32);
-struct point(i32, i32, i32);
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+enum message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
 
 #[derive(Debug)]
-struct rectangle {
-    width: u32,
-    height: u32,
+enum UsState{
+    Alabama,
+    Alaska
 }
 
-impl rectangle {
-    fn area(&self) -> u32 {
-        self.width * self.height
-    }
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
 
-    fn can_hold(&self, rect: &rectangle) -> bool {
-        if self.width > rect.width && self.height > rect.height {
-            true
-        } else {
-            false
-        }
-    }
-    
-    fn square(size:u32) -> Self{
-        Self{
-            width:size,
-            height:size
-        }
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {state:?}!");
+            25
+        },
     }
 }
-fn build_user(email: &String, username: &String) -> User {
-    User {
-        active: true,
-        username: username.clone(),
-        email: email.clone(),
-        sign_in_count: 1,
+
+fn plus_one(x: Option<i32>) -> Option<i32>{
+    match x {
+        None => None,
+        Some(i) => Some(i+1),
     }
 }
 
 fn main() {
-    let mut user1 = User {
-        active: true,
-        username: String::from("kenobi"),
-        email: String::from("something@something.com"),
-        sign_in_count: 1,
-    };
+    let four = IpAddrKind::V4;
+    let six = IpAddrKind::V6;
 
-    user1.email = String::from("somethingelse@somethingelse.com");
-
-    let user2 = build_user(&user1.email, &user1.username);
-    let user3 = User {
-        email: String::from("newthing@newthing.com"),
-        ..user1
-    };
-    let black = color(0, 0, 0);
-    let origin = point(0, 0, 0);
-
-    let rect1 = rectangle {
-        width: 30,
-        height: 50,
-    };
-
-    let rect2 = rectangle {
-        width: 20,
-        height: 30,
-    };
-
-    let rect3 = rectangle {
-        width: 40,
-        height: 20,
-    };
-
-    println!("Area of the rectangle is {}", area(&rect1));
-
-    println!("Area of the rectangle is {}", rect1.area());
-
-    println!("rect1 {:#?}", rect1);
-
-    println!("will rect2 fit in rect1?: {}", rect1.can_hold(&rect2));
-    println!("will rect3 fit in rect1?: {}", rect1.can_hold(&rect3));
+    let home = IpAddr::V4(127, 0, 0, 1);
+    let loopback = IpAddr::V6(String::from("::1"));
     
-    println!("square rect1: {:#?}",rectangle::square(3));
-}
-
-fn area(rectangle: &rectangle) -> u32 {
-    rectangle.width * rectangle.height
+    value_in_cents(Coin::Quarter(UsState::Alaska));
+    
+    let five = Some(5);
+    let six = plus_one(five);
+    let none = plus_one(None);
 }

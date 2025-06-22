@@ -1,67 +1,37 @@
-use std::fs;
-use std::fs::File;
-use std::io::ErrorKind;
-use std::io::{self,Read};
-use std::error::Error;
+use std::f64::consts::PI;
 
-// fn read_username_from_file() -> Result<String,io::Error> {
-//     let username_file_result = File::open("hello.txt");
+fn largest_i32(list: &[i32]) -> &i32 {
+    let mut largest = &list[0];
     
-//     let mut username_file = match username_file_result {
-//         Ok(file) => file,
-//         Err(e) => return Err(e),
-//     };
-    
-//     let mut username = String::new();
-    
-//     match username_file.read_to_string(&mut username) {
-//         Ok(_) => Ok(username),
-//         Err(e) => Err(e)
-//     }
-// }
-
-fn read_username_from_file_normal_version() -> Result<String,io::Error> {
-    let mut username_file = File::open("hello.txt")?;
-    let mut username = String::new();
-    username_file.read_to_string(&mut username)?;
-    Ok(username)
-}
-
-fn read_username_from_file_shorter_verison() -> Result<String,io::Error> {
-
-    let mut username = String::new();
-    File::open("hello.txt")?.read_to_string(&mut username)?;
-    Ok(username)
-}
-
-fn read_username_from_file_the_shortest_version() -> Result<String,io::Error> {
-    fs::read_to_string("hello.txt")
-}
-
-fn last_char_of_first_line(text: &str) -> Option<char> {
-    text.lines().next()?.chars().last()
-}
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let v = vec![1,2,3];
-    
-    //v[99];
-    
-    let greeting_file_result = File::open("hello.txt");
-    
-    let greeting_file = match greeting_file_result {
-        Ok(file) => file,
-        Err(error) => match error.kind() {
-            ErrorKind::NotFound => match File::create("hello.txt") {
-                Ok(fc) => fc,
-                Err(e) => panic!("Problem creating the file: {e:?}"),
-            },
-            _ => {
-                panic!("Problem opening the file: {error:?}")
-            }
+    for item in list {
+        if item > largest {
+            largest = item;
         }
-    };
-    let greeting_file = File::open("hello.txt")?;
+    }
+    largest
+}
+
+fn largest_char(list: &[char]) -> &char {
+    let mut largest = &list[0];
     
-    Ok(())
+    for item in list {
+        if item > largest {
+            largest = item
+        }
+    }
+    
+    largest
+}
+
+fn main(){
+    let number_list = vec![34,50,25,100,65];
+    
+    let mut largest1 = largest_i32(&number_list);
+    
+    let char_list = vec!['y','m','a','q'];
+    
+    let mut largest2 = largest_char(&char_list);
+    println!("The largest number is {largest1}");
+    
+    println!("The largest number is {largest2}");
 }

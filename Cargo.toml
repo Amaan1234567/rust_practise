@@ -1,5 +1,5 @@
 [package]
-name = "errors"
+name = "generics_traits_and_lifetimes"
 version = "0.1.0"
 edition = "2024"
 

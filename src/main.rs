@@ -1,50 +1,91 @@
-//generics on structs
-struct point<T> {
-    x:T,
-    y:T,
+use std::fmt::{Debug, Display};
+
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
 }
 
-struct point2<T,U>{
-    x:T,
-    y:U,
-}
-
-impl<T> point<T> {
-    fn x(&self) -> &T {
-        &self.x
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{},by {} ({})", self.headline,self.author,self.location)
     }
 }
 
-enum example<T>{
-    A(T),
-    B(T),
+pub struct SocialPost {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub repost: bool,
 }
 
-fn largest<T>(list: &[T]) -> &T {
-    let mut largest = &list[0];
-    
-    for item in list {
-        if item > largest {
-            largest = item;
+impl Summary for SocialPost {
+    fn summarize(&self) -> String {
+        format!("{}: {}",self.username,self.content)
+    }
+}
+
+//pub fn notify<T: Summary>(item: &T) {
+//    println!("Breaking news! {}",item.summarize());
+//}
+// below is syntactic sugar for the function written above
+
+pub fn notify(item: &impl Summary) {
+    println!("Breaking news! {}",item.summarize());
+}
+
+// pub fn notify(item: &(impl Summary + Display))
+// pub fn notify<T: Summary + Display>(item: &T)
+
+fn some_funtion<T, U>(t: &T,u: &U) -> i32
+where 
+    T:Display + Clone,
+    U: Clone + Debug,
+{
+    1
+}
+
+fn returns_summarizable() -> impl Summary{
+    SocialPost {
+        username:String::from("horse_ebooks"),
+        content:String::from(
+            "of course, as you probablly already know, people"
+        ),
+        reply: false,
+        repost: false,
+    }
+}
+
+
+struct Pair<T> {
+    x: T,
+    y: T
+}
+
+impl<T:Display + PartialOrd>Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}",self.x);
+        }
+        else {
+            println!("The largest member is y = {}",self.y);
         }
     }
-    largest
 }
 
-
-fn main(){
-    let number_list = vec![34,50,25,100,65];
+fn main() {
+    let post = SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from(
+            "of course, as you probably already know, people"
+        ),
+        reply: false,
+        repost: false,
+    };
     
-    let mut largest1 = largest(&number_list);
-    
-    let char_list = vec!['y','m','a','q'];
-    
-    let mut largest2 = largest(&char_list);
-    println!("The largest number is {largest1}");
-    
-    println!("The largest number is {largest2}");
-    
-    let p = point {x: 5,y:10};
-    
-    println!("p.x = {}",p.x())
+    println!("1 new social post: {}",post.summarize())
 }

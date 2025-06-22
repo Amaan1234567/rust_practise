@@ -1,6 +1,26 @@
-use std::f64::consts::PI;
+//generics on structs
+struct point<T> {
+    x:T,
+    y:T,
+}
 
-fn largest_i32(list: &[i32]) -> &i32 {
+struct point2<T,U>{
+    x:T,
+    y:U,
+}
+
+impl<T> point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+enum example<T>{
+    A(T),
+    B(T),
+}
+
+fn largest<T>(list: &[T]) -> &T {
     let mut largest = &list[0];
     
     for item in list {
@@ -11,27 +31,20 @@ fn largest_i32(list: &[i32]) -> &i32 {
     largest
 }
 
-fn largest_char(list: &[char]) -> &char {
-    let mut largest = &list[0];
-    
-    for item in list {
-        if item > largest {
-            largest = item
-        }
-    }
-    
-    largest
-}
 
 fn main(){
     let number_list = vec![34,50,25,100,65];
     
-    let mut largest1 = largest_i32(&number_list);
+    let mut largest1 = largest(&number_list);
     
     let char_list = vec!['y','m','a','q'];
     
-    let mut largest2 = largest_char(&char_list);
+    let mut largest2 = largest(&char_list);
     println!("The largest number is {largest1}");
     
     println!("The largest number is {largest2}");
+    
+    let p = point {x: 5,y:10};
+    
+    println!("p.x = {}",p.x())
 }

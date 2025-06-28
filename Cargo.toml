@@ -1,10 +1,6 @@
 [package]
-name = "generics_traits_and_lifetimes"
+name = "adder"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-rand = "0.9.1"
-
-[profile.release]
-panic = 'abort'

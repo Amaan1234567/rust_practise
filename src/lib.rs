@@ -1,126 +1,87 @@
-#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
+use std::fs;
+use std::error::Error;
+use std::env;
 
-impl Rectangle {
-    fn can_hold(&self,other: &Rectangle) -> bool  {
-        self.width > other.width &&self.height > other.height
+pub fn run(config: Config) -> Result<(),Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+    
+    let results = if config.ignore_case {
+        search_case_insensitive(&config.query, &contents)
+    } else {
+        search(&config.query, &contents)
+    };
+    
+    for line in results {
+        println!("{line}");
     }
+    
+    Ok(())
 }
 
-pub fn greeting(name: &str) -> String {
-    format!("Hello {name}!")
+pub struct Config {
+    pub query: String,
+    pub file_path: String,
+    pub ignore_case: bool,
 }
 
-pub fn add_two(a: usize) -> usize {
-    a+2
-}
-
-fn internal_adder(left:usize,right:usize) -> usize {
-    left+right
-}
-
-pub struct Guess {
-    value: i32,
-}
-
-impl Guess {
-    pub fn new(value: i32) -> Guess {
-        if value < 1 {
-            panic!(
-                "Guess value must be greater than or equal to 1, got {value}."
-            );
-        } else if value > 100 {
-            panic!(
-                "Guess value must be less than or equal to 100, got {value}."
-            );
+impl Config {
+    pub fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("Not enough arguments");
         }
-
-        Guess { value }
+        let query = args[1].clone();
+        let file_path = args[2].clone();
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+        Ok(Config { query, file_path , ignore_case})
     }
 }
 
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut res = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            res.push(line);
+        }        
+    }
+    res
+}
 
-
+pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
+    let mut res = Vec::new();
+    let query = query.to_lowercase();
+    for line in contents.lines() {
+        if line.to_lowercase().contains(&query) {
+            res.push(line);
+        }        
+    }
+    res
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn larger_can_hold_smaller() {
-        let larger = Rectangle {
-            width: 8,
-            height: 7,
-        };
-        let smaller = Rectangle {
-            width: 5,
-            height: 1,
-        };
-        assert!(larger.can_hold(&smaller));
-    }
     
     #[test]
-    fn smaller_cannot_hold_smaller() {
-        let larger = Rectangle {
-            width: 8,
-            height: 7,
-        };
-        let smaller = Rectangle {
-            width: 5,
-            height: 1,
-        };
-        assert!(!smaller.can_hold(&larger));
-    }
-    
-    #[test]
-    fn it_adds_two(){
-        let result = add_two(2);
-        assert_eq!(result,4);
-    }
-    
-    #[test]
-    fn internal() {
-        let result = internal_adder(2,2);
-        assert_eq!(result,4);
-    }
-    
-    #[test]
-    fn greeting_contains_name() {
-        let result = greeting("Carol");
-        assert!(result.contains("Carol"),
-            "Greeting did not contain name, value was `{result}`");
-    }
-    
-    #[test]
-    #[should_panic(expected = "less than or equal to 100")]
-    fn greater_than_100(){
-        Guess::new(200);
-    }
-    
-    #[test]
-    fn add_two_and_two() {
-        let result = add_two(2);
-        assert_eq!(result,4);
-    }
-    
-    #[test]
-    fn add_three_and_two() {
-        let result = add_two(3);
-        assert_eq!(result,5);
-    }
-    
-    #[test]
-    fn one_hundred() {
-        let result = add_two(100);
-        assert_eq!(result,102);
-    }
-    
-    #[test]
-    #[ignore]
-    fn expensive_test(){
+    fn case_sensitive() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Duct tape";
         
+        assert_eq!(vec!["safe, fast, productive."],search(query,contents));
+    }
+    
+    #[test]
+    fn case_insensitive() {
+        let query = "rUst";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Trust me.";
+        
+        assert_eq!(vec!["Rust:","Trust me."],search_case_insensitive(query,contents));
     }
 }

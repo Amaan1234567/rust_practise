@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "iterators_and_closures"
+name = "minigrep"
 version = "0.1.0"

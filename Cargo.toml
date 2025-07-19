@@ -1,3 +1,3 @@
 [workspace]
 resolver = "3"
-members = [ "add_one", "add_two","adder" , "async_and_await", "blog", "fearless_concurrency","minigrep", "oop", "patterns_and_matching", "smart_pointers"]
+members = [ "add_one", "add_two","adder" , "advanced_features", "async_and_await", "blog", "fearless_concurrency", "hello_macro", "hello_macro_derive","minigrep", "oop", "pancakes", "patterns_and_matching", "smart_pointers"]
